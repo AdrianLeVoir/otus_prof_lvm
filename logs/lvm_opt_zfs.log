@@ -1,0 +1,48 @@
+Script started on 2026-09-27 22:27:51+00:00 [COMMAND="bash /tmp/opt_zfs_demo.sh" <not executed on terminal>]
++ echo '########## ZFS /opt: data + snapshot + rollback ##########'
+########## ZFS /opt: data + snapshot + rollback ##########
++ mkdir -p /opt/appdata
++ echo 'hello zfs /opt'
++ ls -l /opt/appdata
+total 1
+-rw-r--r-- 1 root root 15 Sep 27 22:27 important.txt
++ zfs list -o name,used,avail,mountpoint,compression,atime
+NAME          USED  AVAIL  MOUNTPOINT  COMPRESS        ATIME
+optpool       552K  5.33G  /optpool    lz4             off
+optpool/opt    96K  5.33G  /opt        lz4             off
++ echo '########## create snapshot ##########'
+########## create snapshot ##########
++ zfs snapshot optpool/opt@snap1
++ zfs list -t snapshot
+NAME                   USED  AVAIL  REFER  MOUNTPOINT
+optpool/opt@baseline    64K      -    96K  -
+optpool/opt@snap1        0B      -   104K  -
++ echo '########## delete data ##########'
+########## delete data ##########
++ rm -f /opt/appdata/important.txt
++ ls -l /opt/appdata
+total 0
++ echo '########## rollback to snapshot ##########'
+########## rollback to snapshot ##########
++ zfs rollback optpool/opt@snap1
++ cat /opt/appdata/important.txt
+hello zfs /opt
++ zfs list -t snapshot
+NAME                   USED  AVAIL  REFER  MOUNTPOINT
+optpool/opt@baseline    64K      -    96K  -
+optpool/opt@snap1        0B      -   104K  -
++ zpool status
+  pool: optpool
+ state: ONLINE
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	optpool     ONLINE       0     0     0
+	  sdd1      ONLINE       0     0     0
+	cache
+	  sdd2      ONLINE       0     0     0
+
+errors: No known data errors
++ set +x
+
+Script done on 2026-09-27 22:27:52+00:00 [COMMAND_EXIT_CODE="0"]

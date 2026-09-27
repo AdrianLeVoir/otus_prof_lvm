@@ -1,0 +1,43 @@
+Script started on 2026-09-27 22:28:55+00:00 [COMMAND="bash /tmp/fs_options_demo.sh" <not executed on terminal>]
++ echo '########## current mounts ##########'
+########## current mounts ##########
++ findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS / /boot /home /var /opt
++ echo '########## try different options on /home (nosuid,nodev,noatime) ##########'
+########## try different options on /home (nosuid,nodev,noatime) ##########
++ mount -o remount,noatime,nosuid,nodev /home
++ findmnt -o TARGET,FSTYPE,OPTIONS /home
+TARGET
+      FSTYPE OPTIONS
+/home xfs    rw,nosuid,nodev,noatime,attr2,inode64,logbufs=8,logbsize=32k,noquot
++ echo '########## revert /home to fstab options ##########'
+########## revert /home to fstab options ##########
++ mount -o remount,rw,defaults,noatime /home
++ findmnt -o TARGET,FSTYPE,OPTIONS /home
+TARGET
+      FSTYPE OPTIONS
+/home xfs    rw,noatime,attr2,inode64,logbufs=8,logbsize=32k,noquota
++ echo '########## try commit interval on /var ##########'
+########## try commit interval on /var ##########
++ findmnt -o TARGET,FSTYPE,OPTIONS /var
+TARGET
+     FSTYPE OPTIONS
+/var ext4   rw,noatime,commit=60,stripe=32
++ mount -o remount,noatime,commit=60 /var
++ findmnt -o TARGET,FSTYPE,OPTIONS /var
+TARGET
+     FSTYPE OPTIONS
+/var ext4   rw,noatime,commit=60,stripe=32
++ echo '########## filesystems in use ##########'
+########## filesystems in use ##########
++ df -hT
++ grep -vE 'tmpfs|udev'
+Filesystem                        Type   Size  Used Avail Use% Mounted on
+/dev/mapper/ubuntu--vg-ubuntu--lv ext4   7.8G  6.3G  1.1G  86% /
+/dev/mapper/vg_var-var            ext4   3.9G  501M  3.2G  14% /var
+/dev/sda2                         ext4   2.0G  102M  1.7G   6% /boot
+/dev/mapper/ubuntu--vg-home       xfs    9.9G  226M  9.7G   3% /home
+optpool                           zfs    5.4G  128K  5.4G   1% /optpool
+optpool/opt                       zfs    5.4G  128K  5.4G   1% /opt
++ set +x
+
+Script done on 2026-09-27 22:28:55+00:00 [COMMAND_EXIT_CODE="0"]

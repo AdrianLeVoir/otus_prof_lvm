@@ -1,0 +1,149 @@
+Script started on 2026-09-27 22:27:43+00:00 [COMMAND="bash /tmp/home_snap_demo.sh" <not executed on terminal>]
++ echo '########## 1. GENERATE FILES IN /home ##########'
+########## 1. GENERATE FILES IN /home ##########
++ mkdir -p /home/hwfiles
+++ seq 1 20
++ for i in $(seq 1 20)
++ echo 'important content 1'
++ for i in $(seq 1 20)
++ echo 'important content 2'
++ for i in $(seq 1 20)
++ echo 'important content 3'
++ for i in $(seq 1 20)
++ echo 'important content 4'
++ for i in $(seq 1 20)
++ echo 'important content 5'
++ for i in $(seq 1 20)
++ echo 'important content 6'
++ for i in $(seq 1 20)
++ echo 'important content 7'
++ for i in $(seq 1 20)
++ echo 'important content 8'
++ for i in $(seq 1 20)
++ echo 'important content 9'
++ for i in $(seq 1 20)
++ echo 'important content 10'
++ for i in $(seq 1 20)
++ echo 'important content 11'
++ for i in $(seq 1 20)
++ echo 'important content 12'
++ for i in $(seq 1 20)
++ echo 'important content 13'
++ for i in $(seq 1 20)
++ echo 'important content 14'
++ for i in $(seq 1 20)
++ echo 'important content 15'
++ for i in $(seq 1 20)
++ echo 'important content 16'
++ for i in $(seq 1 20)
++ echo 'important content 17'
++ for i in $(seq 1 20)
++ echo 'important content 18'
++ for i in $(seq 1 20)
++ echo 'important content 19'
++ for i in $(seq 1 20)
++ echo 'important content 20'
++ ls -1 /home/hwfiles
+file1
+file10
+file11
+file12
+file13
+file14
+file15
+file16
+file17
+file18
+file19
+file2
+file20
+file3
+file4
+file5
+file6
+file7
+file8
+file9
++ echo '########## 2. CREATE SNAPSHOT ##########'
+########## 2. CREATE SNAPSHOT ##########
++ lvcreate -L 200M -s -n home_snap /dev/ubuntu-vg/home
+  Logical volume "home_snap" created.
++ lvs -a -o lv_name,vg_name,lv_size,lv_attr,origin
+  LV             VG        LSize   Attr       Origin
+  home           ubuntu-vg  10.00g owi-aos---       
+  home_snap      ubuntu-vg 200.00m swi-a-s--- home  
+  ubuntu-lv      ubuntu-vg   8.00g -wi-ao----       
+  var            vg_var      4.00g rwi-aor---       
+  [var_rimage_0] vg_var      4.00g iwi-aor---       
+  [var_rimage_1] vg_var      4.00g iwi-aor---       
+  [var_rmeta_0]  vg_var      4.00m ewi-aor---       
+  [var_rmeta_1]  vg_var      4.00m ewi-aor---       
++ echo '########## 3. DELETE PART OF FILES ##########'
+########## 3. DELETE PART OF FILES ##########
++ rm -f /home/hwfiles/file11 /home/hwfiles/file12 /home/hwfiles/file13 /home/hwfiles/file14 /home/hwfiles/file15 /home/hwfiles/file16 /home/hwfiles/file17 /home/hwfiles/file18 /home/hwfiles/file19 /home/hwfiles/file20
++ ls -1 /home/hwfiles
+file1
+file10
+file2
+file3
+file4
+file5
+file6
+file7
+file8
+file9
++ echo '########## 4. RESTORE FROM SNAPSHOT ##########'
+########## 4. RESTORE FROM SNAPSHOT ##########
++ mkdir -p /mnt/snap
++ mount -o ro,nouuid /dev/ubuntu-vg/home_snap /mnt/snap
++ echo '--- files seen in snapshot ---'
+--- files seen in snapshot ---
++ ls -1 /mnt/snap/hwfiles
+file1
+file10
+file11
+file12
+file13
+file14
+file15
+file16
+file17
+file18
+file19
+file2
+file20
+file3
+file4
+file5
+file6
+file7
+file8
+file9
++ cp -a /mnt/snap/hwfiles/. /home/hwfiles/
++ umount /mnt/snap
++ echo '--- /home after restore ---'
+--- /home after restore ---
++ ls -1 /home/hwfiles
+file1
+file10
+file11
+file12
+file13
+file14
+file15
+file16
+file17
+file18
+file19
+file2
+file20
+file3
+file4
+file5
+file6
+file7
+file8
+file9
++ set +x
+
+Script done on 2026-09-27 22:27:44+00:00 [COMMAND_EXIT_CODE="0"]
